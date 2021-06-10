@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+#This script will help you to retrieve the funds from the validator & stake them through delegation 
+#It works as a loop so, no more taking care of this take any more... :)
+#
+#Variables:
+#----------
+#Validator address:
+VALOPER=bcnavaloper....................
+#Wallet:
+WALLET=MyFirstAddress
+#Chain-id
+CHAIN_ID=$(curl -s http://localhost:26657/status | jq -r '.result.node_info.network')
+#Comision:
+FEE=5000
+###
+#ubcna
+echo "Wallet password:"
+read -s password
+
+#Bucle:
+while true;
+do
+  #Tx to withdraw the rewards:
+  echo "Tx to retrieve your rewards:"
+  echo -e "${password}" | bcnad tx distribution withdraw-rewards ${VALOPER} --commission --from ${WALLET} --chain-id ${CHAIN_ID} --fees ${FEE}ubcna -y
+  sleep 120
+
+  #Check the wallet now:
+  AMOUNT=$(bcnad query bank balances bcna1mmp952nf6nhu7c27sx47jesgg7xwpmqt73wkq5 --chain-id ${CHAIN_ID} --output=json | jq -r '.balances[].amount')
+  echo "Amount:"
+  echo $AMOUNT
+
+  #We do not want to fully empty the wallet :) :
+  DEL=$(($AMOUNT-1000000))
+
+  #Final step for delegation:
+
+  echo -e "${password}" | bcnad tx staking delegate ${VALOPER} ${DEL}ubcna --from ${WALLET}  --chain-id ${CHAIN_ID} --fees ${FEE}ubcna -y
+
+  #We wait now for a bit (1hour=>60*60=3600):
+  sleep 3600
+done
