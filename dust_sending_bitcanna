@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# This is a script that helps in producing some stress in the BitCanna network to check its capability to grow in the future when transitioning to mainnet 
+#
+#
+#Variables:
+#----------
+#Validator:
+VALOPER=put yourvalidato radress inhere
+#Wallet:
+WALLET=Putthename of your wallet in here
+#Chain-id
+CHAIN_ID=$(curl -s http://localhost:26657/status | jq -r '.result.node_info.network')
+#Comision:
+FEE=5000
+echo "Wallet password:"
+read -s password
+
+#Loop:
+while true;
+do
+
+  echo "Tx to send some dust for the 1st destination:"
+  echo "..."
+  echo -e "${password}" | bcnad tx bank send originwalletinhere destinationwallet1inhere 2000ubcna --chain-id ${CHAIN_ID} --fees 3000ubcna -y
+  sleep 600s
+  echo "Tx to send some dust for the 2nd destination:"
+  echo "..."
+  echo -e "${password}" | bcnad tx bank send originwalletinhere destinationwallet2inhere 3000ubcna --chain-id ${CHAIN_ID} --fees 3000ubcna -y
+  sleep 600s
+  echo "Tx to send some dust for the 3rd destination:"
+  echo "..."
+  echo -e "${password}" | bcnad tx bank send originwalletinhere destinationwallet3inhere 400ubcna --chain-id ${CHAIN_ID} --fees 3000ubcna -y
+  sleep 600s
+done
